@@ -204,4 +204,91 @@
     if (modalAktif) tutupModal();
     else tutupSisi();
   });
+  // Sorotan kursor di permukaan kaca (kartu, panel, KPI).
+  // Satu pendengar untuk seluruh halaman, bukan satu per kartu; posisi dihitung
+  // sekali per frame dan hanya saat pointer benar-benar bergerak.
+  var bisaSorot = window.matchMedia('(hover: hover) and (pointer: fine)');
+  var kurangiGerak = window.matchMedia('(prefers-reduced-motion: reduce)');
+  if (bisaSorot.matches && !kurangiGerak.matches) {
+    var sorot = null;
+    var sorotX = 0;
+    var sorotY = 0;
+    var sorotAntre = false;
+
+    var gambarSorot = function () {
+      sorotAntre = false;
+      if (!sorot) return;
+      var kotak = sorot.getBoundingClientRect();
+      sorot.style.setProperty('--mx', (sorotX - kotak.left) + 'px');
+      sorot.style.setProperty('--my', (sorotY - kotak.top) + 'px');
+    };
+
+    document.addEventListener('pointermove', function (e) {
+      var permukaan = e.target instanceof Element
+        ? e.target.closest('.kartu, .panel, .kpi')
+        : null;
+      if (!permukaan) { sorot = null; return; }
+      sorot = permukaan;
+      sorotX = e.clientX;
+      sorotY = e.clientY;
+      if (sorotAntre) return;
+      sorotAntre = true;
+      window.requestAnimationFrame(gambarSorot);
+    }, { passive: true });
+
+    // Saat pointer keluar dari permukaan, kembalikan sorotan ke tengah.
+    document.addEventListener('pointerout', function (e) {
+      var dari = e.target instanceof Element ? e.target.closest('.kartu, .panel, .kpi') : null;
+      if (!dari) return;
+      var ke = e.relatedTarget instanceof Element ? e.relatedTarget.closest('.kartu, .panel, .kpi') : null;
+      if (ke === dari) return;
+      dari.style.removeProperty('--mx');
+      dari.style.removeProperty('--my');
+    }, { passive: true });
+  }
+  // Angka KPI dashboard bergerak dari 0 ke nilai akhir. Nilai server tetap
+  // tersimpan di data-hitung, jadi tanpa JavaScript angkanya sudah benar.
+  var angkaKpi = document.querySelectorAll('[data-hitung]');
+  if (angkaKpi.length && !kurangiGerak.matches) {
+    var formatAngka = new Intl.NumberFormat('id-ID');
+    var itemKpi = [];
+
+    var tulisAngka = function (item, nilai) {
+      item.el.textContent = (item.rp ? 'Rp ' : '') + formatAngka.format(nilai);
+    };
+
+    angkaKpi.forEach(function (el) {
+      var nilai = parseInt(el.getAttribute('data-hitung'), 10);
+      if (isNaN(nilai)) return;
+      var item = { el: el, nilai: nilai, rp: el.getAttribute('data-format') === 'rp' };
+      tulisAngka(item, 0);
+      itemKpi.push(item);
+    });
+
+    var mulaiHitung = window.performance.now();
+
+    var gambarHitung = function (waktu) {
+      var selesai = true;
+
+      itemKpi.forEach(function (item, i) {
+        var lewat = waktu - mulaiHitung - (100 + i * 50);
+        if (lewat < 0) { selesai = false; return; }
+
+        var t = Math.min(lewat / 700, 1);
+        var nilai = Math.round(item.nilai * (1 - Math.pow(1 - t, 3)));
+        tulisAngka(item, nilai);
+        if (t < 1) selesai = false;
+      });
+
+      if (!selesai && !kurangiGerak.matches) {
+        window.requestAnimationFrame(gambarHitung);
+      } else if (kurangiGerak.matches) {
+        itemKpi.forEach(function (item) {
+          tulisAngka(item, item.nilai);
+        });
+      }
+    };
+
+    window.requestAnimationFrame(gambarHitung);
+  }
 })();

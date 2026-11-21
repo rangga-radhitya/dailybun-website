@@ -7,8 +7,8 @@
 
   @php
     $lencanaJenis = [
-        'M' => ['kelas' => 'sukses', 'arti' => 'Stok masuk'],
-        'K' => ['kelas' => 'bahaya', 'arti' => 'Stok keluar/koreksi'],
+        'M' => ['kelas' => 'sukses', 'arti' => 'Stok masuk/pengembalian'],
+        'K' => ['kelas' => 'bahaya', 'arti' => 'Stok keluar (penjualan/koreksi)'],
         'R' => ['kelas' => 'proses', 'arti' => 'Retur ke vendor'],
     ];
   @endphp

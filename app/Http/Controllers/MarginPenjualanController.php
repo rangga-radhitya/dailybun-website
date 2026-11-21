@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -40,7 +40,7 @@ class MarginPenjualanController extends Controller
 
             DB::insert(
                 'INSERT INTO margin_penjualan (created_at, persen, status, iduser, updated_at) VALUES (NOW(), ?, ?, ?, NOW())',
-                [(float) $data['persen'], $status, self::ID_USER_DEFAULT]
+                [(float) $data['persen'], $status, $this->idUser()]
             );
         });
 

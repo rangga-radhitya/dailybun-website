@@ -22,7 +22,7 @@
   <div class="tabel-bungkus">
   <table>
     <thead>
-      <tr><th class="kode">ID</th><th>Tanggal</th><th>Vendor</th><th>Dibuat oleh</th><th class="angka">Subtotal</th><th class="angka">PPN</th><th class="angka">Total</th><th class="aksi">Aksi</th></tr>
+      <tr><th class="kode">ID</th><th>Tanggal</th><th>Vendor</th><th>Dibuat oleh</th><th>Status</th><th class="angka">Subtotal</th><th class="angka">PPN</th><th class="angka">Total</th><th class="aksi">Aksi</th></tr>
     </thead>
     <tbody>
     @forelse ($daftar as $r)
@@ -31,6 +31,7 @@
         <td>{{ $r->tanggal ?? '-' }}</td>
         <td>{{ $r->nama_vendor ?? '-' }}</td>
         <td>{{ $r->username ?? '-' }}</td>
+        <td><x-status-pengadaan :status="$r->status" /></td>
         <td class="angka"><x-rp :nilai="$r->subtotal_nilai" /></td>
         <td class="angka"><x-rp :nilai="$r->ppn" /></td>
         <td class="angka"><x-rp :nilai="$r->total_nilai" /></td>
@@ -51,7 +52,7 @@
         </td>
       </tr>
     @empty
-      <tr><td colspan="8" class="kosong">{{ $q !== '' ? 'Tidak ada pengadaan yang cocok dengan pencarian.' : 'Belum ada data pengadaan.' }}</td></tr>
+      <tr><td colspan="9" class="kosong">{{ $q !== '' ? 'Tidak ada pengadaan yang cocok dengan pencarian.' : 'Belum ada data pengadaan.' }}</td></tr>
     @endforelse
     </tbody>
   </table>

@@ -3,6 +3,13 @@
 @section('judul', 'Data Penjualan')
 @section('grup', 'Transaksi')
 
+@section('aksi')
+  <a class="tombol" href="{{ route('penjualan.create') }}">
+    <x-ikon nama="tambah" :ukuran="16" />
+    Tambah Penjualan
+  </a>
+@endsection
+
 @section('isi')
 
   <x-filter-bar :reset="route('penjualan.index')">
@@ -24,15 +31,33 @@
         <td class="kode">{{ $r->idpenjualan }}</td>
         <td>{{ $r->tanggal ?? '-' }}</td>
         <td>{{ $r->username ?? '-' }}</td>
-        <td class="angka"><x-persen :nilai="$r->persen" /></td>
+        <td class="angka margin-sel">
+          @if ($r->persen === null)
+            -
+          @else
+            <span class="margin-nilai"><x-rp :nilai="$r->margin_nilai" /></span>
+            <span class="margin-persen"><x-persen :nilai="$r->persen" /></span>
+          @endif
+        </td>
         <td class="angka">{{ $r->detail_count }}</td>
         <td class="angka"><x-rp :nilai="$r->subtotal_nilai" /></td>
         <td class="angka"><x-rp :nilai="$r->ppn" /></td>
         <td class="angka"><x-rp :nilai="$r->total_nilai" /></td>
-        <td class="aksi"><a class="tombol sekunder kecil" href="{{ route('penjualan.show', $r->idpenjualan) }}">
-          <x-ikon nama="info" :ukuran="14" />
-          Detail
-        </a></td>
+        <td class="aksi">
+          <a class="tombol sekunder kecil" href="{{ route('penjualan.show', $r->idpenjualan) }}">
+            <x-ikon nama="info" :ukuran="14" />
+            Detail
+          </a>
+          <form method="POST" action="{{ route('penjualan.destroy', $r->idpenjualan) }}">
+            @csrf
+            @method('DELETE')
+            <button type="button" class="tombol sekunder kecil"
+                    data-konfirmasi="Hapus penjualan ID {{ $r->idpenjualan }}? Stok barang yang terjual akan dikembalikan otomatis.">
+              <x-ikon nama="hapus" :ukuran="14" />
+              Hapus
+            </button>
+          </form>
+        </td>
       </tr>
     @empty
       <tr><td colspan="9" class="kosong">{{ $q !== '' ? 'Tidak ada penjualan yang cocok dengan pencarian.' : 'Belum ada data penjualan.' }}</td></tr>

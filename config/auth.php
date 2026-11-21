@@ -42,17 +42,17 @@ return [
     |--------------------------------------------------------------------------
     |
     | Provider menentukan cara pengguna diambil dari database. Aplikasi ini
-    | memakai driver "database" sehingga data dibaca langsung dari tabel `user`
-    | tanpa kelas model.
+    | memakai driver "eloquent" dengan model App\Models\User yang memetakan
+    | tabel `user` dan primary key `iduser`.
     |
-    | Driver yang dipakai: "database"
+    | Driver yang dipakai: "eloquent"
     |
     */
 
     'providers' => [
         'users' => [
-            'driver' => 'database',
-            'table' => 'user',
+            'driver' => 'eloquent',
+            'model' => App\Models\User::class,
         ],
     ],
 

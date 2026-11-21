@@ -14,15 +14,31 @@
     <x-ikon nama="kiri" :ukuran="15" />
     Kembali
   </a>
-  <form method="POST" action="{{ route('penerimaan.destroy', $penerimaan->idpenerimaan) }}">
-    @csrf
-    @method('DELETE')
-    <button type="button" class="tombol bahaya"
-            data-konfirmasi="Hapus penerimaan #{{ $penerimaan->idpenerimaan }}? Stok yang sudah masuk akan dikoreksi otomatis.">
-      <x-ikon nama="hapus" :ukuran="15" />
-      Hapus
-    </button>
-  </form>
+  @if ($penerimaan->status === 'C')
+    <form method="POST" action="{{ route('penerimaan.batal_konfirmasi', $penerimaan->idpenerimaan) }}">
+      @csrf
+      @method('PATCH')
+    </form>
+  @else
+    <form method="POST" action="{{ route('penerimaan.konfirmasi', $penerimaan->idpenerimaan) }}">
+      @csrf
+      @method('PATCH')
+      <button type="button" class="tombol utama"
+              data-konfirmasi="Konfirmasi penerimaan #{{ $penerimaan->idpenerimaan }}?">
+        <x-ikon nama="centang" :ukuran="15" />
+        Konfirmasi
+      </button>
+    </form>
+    <form method="POST" action="{{ route('penerimaan.destroy', $penerimaan->idpenerimaan) }}">
+      @csrf
+      @method('DELETE')
+      <button type="button" class="tombol bahaya"
+              data-konfirmasi="Hapus penerimaan #{{ $penerimaan->idpenerimaan }}? Stok yang sudah masuk akan dikoreksi otomatis.">
+        <x-ikon nama="hapus" :ukuran="15" />
+        Hapus
+      </button>
+    </form>
+  @endif
 @endsection
 
 @section('isi')
@@ -33,9 +49,20 @@
     <dl class="info-daftar">
       <div><dt>ID penerimaan</dt><dd>{{ $penerimaan->idpenerimaan }}</dd></div>
       <div><dt>Tanggal</dt><dd>{{ $penerimaan->tanggal ?? '-' }}</dd></div>
-      <div><dt>Pengadaan asal</dt><dd>@if ($penerimaan->idpengadaan)<a href="{{ route('pengadaan.show', $penerimaan->idpengadaan) }}">Pengadaan #{{ $penerimaan->idpengadaan }}</a>@else - @endif</dd></div>
+      <div><dt>Pengadaan asal</dt><dd>
+        @if ($penerimaan->idpengadaan)
+          @akses('pengadaan')
+            <a href="{{ route('pengadaan.show', $penerimaan->idpengadaan) }}">Pengadaan #{{ $penerimaan->idpengadaan }}</a>
+          @else
+            Pengadaan #{{ $penerimaan->idpengadaan }}
+          @endakses
+        @else
+          -
+        @endif
+      </dd></div>
       <div><dt>Vendor</dt><dd>{{ $penerimaan->nama_vendor ?? '-' }}</dd></div>
       <div><dt>Diterima oleh</dt><dd>{{ $penerimaan->username ?? '-' }}</dd></div>
+      <div><dt>Status</dt><dd><x-status-penerimaan :status="$penerimaan->status" /></dd></div>
     </dl>
   </section>
 
@@ -69,27 +96,29 @@
     </div>
   </section>
 
-  <section class="kartu">
-    <h2>Retur terkait</h2>
-    <div class="tabel-bungkus">
-    <table>
-      <thead><tr><th class="kode">ID retur</th><th>Tanggal</th><th>Dibuat oleh</th><th class="aksi">Aksi</th></tr></thead>
-      <tbody>
-      @forelse ($penerimaan->retur as $rt)
-        <tr>
-          <td class="kode">{{ $rt->idretur }}</td>
-          <td>{{ $rt->tanggal ?? '-' }}</td>
-          <td>{{ $rt->username ?? '-' }}</td>
-          <td class="aksi"><a class="tombol sekunder kecil" href="{{ route('retur.show', $rt->idretur) }}">
-            <x-ikon nama="info" :ukuran="14" />
-            Detail
-          </a></td>
-        </tr>
-      @empty
-        <tr><td colspan="4" class="kosong">Belum ada retur untuk penerimaan ini.</td></tr>
-      @endforelse
-      </tbody>
-    </table>
-    </div>
-  </section>
+  @akses('retur')
+    <section class="kartu">
+      <h2>Retur terkait</h2>
+      <div class="tabel-bungkus">
+      <table>
+        <thead><tr><th class="kode">ID retur</th><th>Tanggal</th><th>Dibuat oleh</th><th class="aksi">Aksi</th></tr></thead>
+        <tbody>
+        @forelse ($penerimaan->retur as $rt)
+          <tr>
+            <td class="kode">{{ $rt->idretur }}</td>
+            <td>{{ $rt->tanggal ?? '-' }}</td>
+            <td>{{ $rt->username ?? '-' }}</td>
+            <td class="aksi"><a class="tombol sekunder kecil" href="{{ route('retur.show', $rt->idretur) }}">
+              <x-ikon nama="info" :ukuran="14" />
+              Detail
+            </a></td>
+          </tr>
+        @empty
+          <tr><td colspan="4" class="kosong">Belum ada retur untuk penerimaan ini.</td></tr>
+        @endforelse
+        </tbody>
+      </table>
+      </div>
+    </section>
+  @endakses
 @endsection

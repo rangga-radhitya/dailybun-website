@@ -10,6 +10,12 @@ abstract class Controller
 
     public const PPN_PERSEN = 11;
 
+    /** User yang sedang login; fallback untuk CLI dan pengujian tanpa sesi. */
+    protected function idUser(): int
+    {
+        return (int) (auth()->id() ?? self::ID_USER_DEFAULT);
+    }
+
     protected function tanggal(Request $request, string $kunci): string
     {
         $nilai = (string) $request->query($kunci, '');

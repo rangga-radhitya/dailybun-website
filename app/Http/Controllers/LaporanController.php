@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Support\Akses;
 use DateTime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -52,14 +53,30 @@ class LaporanController extends Controller
         ],
     ];
 
+    /** Modul yang harus dimiliki sebelum laporan jenis ini boleh dibuka. */
+    private const MODUL = [
+        'penjualan' => 'penjualan',
+        'pengadaan' => 'pengadaan',
+        'penerimaan' => 'penerimaan',
+        'retur' => 'retur',
+        'stok' => 'kartu_stok',
+    ];
+
     public function index(): View
     {
-        return view('laporan.index', ['laporan' => self::LAPORAN]);
+        $laporan = array_filter(
+            self::LAPORAN,
+            fn (string $jenis) => Akses::boleh(self::MODUL[$jenis]),
+            ARRAY_FILTER_USE_KEY
+        );
+
+        return view('laporan.index', ['laporan' => $laporan]);
     }
 
     public function show(Request $request, string $jenis): View
     {
         abort_unless(array_key_exists($jenis, self::LAPORAN), 404);
+        abort_unless(Akses::boleh(self::MODUL[$jenis]), 403);
 
         $data = ['jenis' => $jenis, 'laporan' => self::LAPORAN[$jenis]];
 

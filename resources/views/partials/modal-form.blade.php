@@ -46,7 +46,7 @@
           <label for="{{ $fid }}">{{ $f['label'] }}@if (!empty($f['wajib']))<span class="wajib" aria-hidden="true"> *</span>@endif</label>
           @if ($tipe === 'select')
             <select id="{{ $fid }}" name="{{ $f['name'] }}" @if (!empty($f['wajib'])) required @endif @if ($adaHint) aria-describedby="{{ $fid }}-hint" @endif>
-              <option value="">— Pilih —</option>
+              <option value="">Pilih</option>
               @foreach ($f['options'] as $nilai => $teks)
                 <option value="{{ $nilai }}" @selected((string) $nilaiLama === (string) $nilai)>{{ $teks }}</option>
               @endforeach

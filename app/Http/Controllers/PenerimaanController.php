@@ -86,7 +86,7 @@ class PenerimaanController extends Controller
         try {
             $id = $this->tambah(
                 (int) $data['idpengadaan'],
-                self::ID_USER_DEFAULT,
+                $this->idUser(),
                 'D',
                 $items
             );

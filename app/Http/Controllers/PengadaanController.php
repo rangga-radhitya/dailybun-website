@@ -88,7 +88,7 @@ class PengadaanController extends Controller
 
         try {
             $id = $this->tambah(
-                self::ID_USER_DEFAULT,
+                $this->idUser(),
                 (int) $data['idvendor'],
                 'D',
                 $items,

@@ -3,21 +3,33 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#100D0B">
+  <meta name="theme-color" content="#140E0A">
   <meta name="color-scheme" content="dark">
   <title>@yield('judul') - {{ config('app.name', 'Daily Bun') }}</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="{{ asset('img/favicon.png') }}">
   <link rel="stylesheet" href="{{ asset('css/style.css') }}">
   <script src="{{ asset('js/app.js') }}" defer></script>
 </head>
 <body>
 @php
   // Menu dibaca dari config/menu.php (satu sumber untuk sidebar).
-  $menu = config('menu', []);
+  // Item tanpa hak akses dibuang; grup yang kosong ikut disembunyikan.
+  $menu = collect(config('menu', []))
+      ->map(function (array $entri) {
+          if (isset($entri['items'])) {
+              $entri['items'] = array_values(array_filter(
+                  $entri['items'],
+                  fn (array $item) => \App\Support\Akses::boleh($item['modul'])
+              ));
+          }
+
+          return $entri;
+      })
+      ->reject(fn (array $entri) => isset($entri['items']) && $entri['items'] === []);
+
   $tautan = fn (array $m) => route($m['route'], $m['params'] ?? []);
   $menuAktif = fn (array $m) => request()->is(...($m['match'] ?? []));
+  $saya = auth()->user();
 @endphp
 <a class="lewati" href="#konten">Lewati ke konten</a>
 <div class="aplikasi">
@@ -26,12 +38,7 @@
     <div class="sisi-merek">
       <a href="{{ route('dashboard') }}">
         <span class="merek-ikon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M4 15c0-4.4 3.6-8 8-8s8 3.6 8 8"/>
-            <path d="M4 15h16"/>
-            <path d="M7 15c.5-2 1.6-3.6 3-4.6M17 15c-.5-2-1.6-3.6-3-4.6"/>
-            <path d="M9 4.5c0 .8-.7 1.5-1.5 1.5M15 4.5c0 .8-.7 1.5-1.5 1.5"/>
-          </svg>
+          <img src="{{ asset('img/logo-icon.png') }}" alt="" width="42" height="42" decoding="async">
         </span>
         <span class="merek-teks">
           <strong>{{ config('app.name', 'Daily Bun') }}</strong>
@@ -93,12 +100,22 @@
       </nav>
 
       <div class="bar-kanan">
-        <div class="pengguna" title="Transaksi dicatat atas nama manajer01">
-          <span class="pengguna-avatar" aria-hidden="true">M</span>
-          <span class="pengguna-teks">
-            <strong>manajer01</strong>
-          </span>
-        </div>
+        @if ($saya)
+          <div class="pengguna" title="Masuk sebagai {{ $saya->username }}">
+            <span class="pengguna-avatar" aria-hidden="true">{{ mb_strtoupper(mb_substr($saya->username, 0, 1)) }}</span>
+            <span class="pengguna-teks">
+              <strong>{{ $saya->username }}</strong>
+              <small>{{ $saya->role?->nama_role ?? 'Tanpa role' }}</small>
+            </span>
+          </div>
+          <form method="POST" action="{{ route('logout') }}">
+            @csrf
+            <button type="submit" class="tombol sekunder kecil keluar">
+              <x-ikon nama="keluar" :ukuran="15" />
+              <span class="keluar-teks">Keluar</span>
+            </button>
+          </form>
+        @endif
       </div>
     </header>
 

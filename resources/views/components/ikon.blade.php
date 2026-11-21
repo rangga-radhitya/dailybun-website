@@ -142,6 +142,12 @@
       <path d="M9 20v-6h6v6"/>
       @break
 
+    @case('keluar')
+      <path d="M10 4H5a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h5"/>
+      <path d="M15 8l4 4-4 4"/>
+      <path d="M19 12H9"/>
+      @break
+
     @default
       <rect x="4" y="4" width="16" height="16" rx="3"/>
   @endswitch

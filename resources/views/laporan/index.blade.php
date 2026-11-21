@@ -21,7 +21,7 @@
   </div>
 
   <x-catatan ringkas judul="Status laporan" class="catatan-laporan">
-    Laporan Penjualan sudah tersedia dan dihitung langsung dari tabel penjualan.
-    Laporan lain menunggu query agregasi di backend.
+    Laporan yang tampil mengikuti akses role Anda.
+    Laporan bertanda "Belum tersedia" menunggu query agregasi di backend.
   </x-catatan>
 @endsection

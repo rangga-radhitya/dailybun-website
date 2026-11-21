@@ -84,7 +84,7 @@ class ReturController extends Controller
         }
 
         try {
-            $id = $this->tambah((int) $data['idpenerimaan'], self::ID_USER_DEFAULT, $items);
+            $id = $this->tambah((int) $data['idpenerimaan'], $this->idUser(), $items);
         } catch (PDOException $e) {
             return back()->withInput()->with('gagal', $e->errorInfo[2] ?? 'Retur gagal disimpan.');
         } catch (RuntimeException $e) {
