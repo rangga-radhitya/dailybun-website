@@ -281,7 +281,11 @@ class PenjualanController extends Controller
                     );
                 }
 
-                $subTotal = $harga * $jumlah;
+                // fn_hitung_subtotal(harga_satuan, jumlah).
+                $subTotal = (int) DB::selectOne(
+                    'SELECT fn_hitung_subtotal(?, ?) AS sub_total',
+                    [$harga, $jumlah]
+                )->sub_total;
 
                 DB::insert(
                     'INSERT INTO detail_penjualan (harga_satuan, jumlah, subtotal, penjualan_idpenjualan, idbarang)

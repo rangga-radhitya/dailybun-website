@@ -4,7 +4,7 @@ Tahap: implementasi **3 Function, 2 Stored Procedure, dan 2 Trigger** yang dapat
 
 | Objek | Nama | Dipakai di frontend |
 |---|---|---|
-| FUNCTION | `fn_hitung_subtotal(harga_satuan, jumlah)` | perhitungan sub total saat menyimpan pengadaan |
+| FUNCTION | `fn_hitung_subtotal(harga_satuan, jumlah)` | perhitungan sub total saat menyimpan pengadaan & penjualan |
 | FUNCTION | `fn_hitung_ppn(subtotal, persen)` | perhitungan PPN saat menyimpan pengadaan & penjualan |
 | FUNCTION | `fn_stok_barang(idbarang)` | menampilkan stok terkini di `/barang` & `/penjualan/create` |
 | PROCEDURE | `sp_aktifkan_margin_penjualan(idmargin)` | tombol **Aktifkan** di `/margin_penjualan` |
@@ -22,7 +22,7 @@ Skema tabel, kolom, index, dan data tidak diubah.
 - Mengembalikan hasil kali `p_harga * p_jumlah` sebagai `INT`.
 - Nilai kosong/`NULL` atau negatif dianggap `0` memakai `CASE` tanpa percabangan `IF`.
 - Bersifat `DETERMINISTIC` dan `NO SQL`.
-- Dipakai di `PengadaanController::tambah()` untuk mengisi `detail_pengadaan.sub_total`.
+- Dipakai di `PengadaanController::tambah()` dan `PenjualanController::tambah()` untuk mengisi `sub_total` / `subtotal` detail.
 
 ### `fn_hitung_ppn(p_subtotal, p_persen)`
 - Mengembalikan `ROUND(subtotal * persen / 100)` sebagai `INT`.

@@ -5,8 +5,8 @@
 --
 -- Tujuh objek (3 Function, 2 Stored Procedure, 2 Trigger):
 --   1. FUNCTION  fn_hitung_subtotal(harga_satuan, jumlah)
---        Menghitung sub total satu baris detail pengadaan
---        (harga_satuan x jumlah). Dipakai saat menyimpan pengadaan.
+--        Menghitung sub total satu baris detail (harga_satuan x jumlah).
+--        Dipakai saat menyimpan pengadaan dan penjualan.
 --   2. FUNCTION  fn_hitung_ppn(subtotal, persen)
 --        Menghitung nilai PPN dibulatkan (ROUND(subtotal * persen / 100)).
 --        Dipakai saat menyimpan pengadaan dan penjualan.
