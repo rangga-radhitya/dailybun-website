@@ -288,12 +288,6 @@ class PenjualanController extends Controller
                      VALUES (?, ?, ?, ?, ?)',
                     [$harga, $jumlah, $subTotal, $id, $idbarang]
                 );
-
-                DB::insert(
-                    'INSERT INTO kartu_stok (jenis_transaksi, masuk, keluar, stock, created_at, idtransaksi, idbarang)
-                     VALUES (?, 0, ?, ?, NOW(), ?, ?)',
-                    ['K', $jumlah, $saldo - $jumlah, $id, $idbarang]
-                );
             }
 
             $subtotalBarang = (int) DB::selectOne(
@@ -303,7 +297,12 @@ class PenjualanController extends Controller
 
             $marginNilai = (int) round($subtotalBarang * $marginPersen / 100);
             $subtotal = $subtotalBarang + $marginNilai;
-            $ppn = (int) round($subtotal * $ppnPersen / 100);
+
+            // fn_hitung_ppn(subtotal, persen).
+            $ppn = (int) DB::selectOne(
+                'SELECT fn_hitung_ppn(?, ?) AS ppn',
+                [$subtotal, $ppnPersen]
+            )->ppn;
 
             DB::update(
                 'UPDATE penjualan SET subtotal_nilai = ?, ppn = ?, total_nilai = ? WHERE idpenjualan = ?',
@@ -335,9 +334,7 @@ class PenjualanController extends Controller
     {
         return DB::select(
             "SELECT b.idbarang, b.nama, b.harga, s.nama_satuan,
-                    COALESCE((SELECT ks.stock FROM kartu_stok ks
-                               WHERE ks.idbarang = b.idbarang
-                               ORDER BY ks.idkartu_stok DESC LIMIT 1), 0) AS stok
+                    fn_stok_barang(b.idbarang) AS stok
              FROM barang b
              LEFT JOIN satuan s ON s.idsatuan = b.idsatuan
              WHERE b.status = 1

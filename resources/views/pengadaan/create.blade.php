@@ -51,7 +51,8 @@
       </div>
       <div class="grup-filter">
         <label>Dibuat oleh</label>
-        <input type="text" value="manajer01" disabled>
+        @php $pengguna = auth()->user(); @endphp
+        <input type="text" value="{{ $pengguna ? $pengguna->username.' (user id '.$pengguna->iduser.')' : '-' }}" disabled>
       </div>
     </div>
   </section>

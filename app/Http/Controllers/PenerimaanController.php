@@ -90,6 +90,7 @@ class PenerimaanController extends Controller
                 'D',
                 $items
             );
+            $this->sinkronStatusPengadaan((int) $data['idpengadaan']);
         } catch (PDOException $e) {
             return back()->withInput()->with('gagal', $e->errorInfo[2] ?? 'Penerimaan gagal disimpan.');
         } catch (RuntimeException $e) {
@@ -99,14 +100,75 @@ class PenerimaanController extends Controller
         return redirect()->route('penerimaan.show', $id)->with('sukses', 'Penerimaan berhasil disimpan dan stok sudah diperbarui.');
     }
 
-    public function destroy(int $id): RedirectResponse
+    public function konfirmasi(int $id): RedirectResponse
     {
-        if ($this->cari($id) === null) {
+        $penerimaan = $this->cari($id);
+
+        if ($penerimaan === null) {
             return redirect()->route('penerimaan.index')->with('gagal', 'Penerimaan tidak ditemukan.');
         }
 
+        if ($penerimaan->status === 'C') {
+            return redirect()->route('penerimaan.show', $id)->with('gagal', 'Penerimaan sudah terkonfirmasi.');
+        }
+
+        DB::transaction(function () use ($penerimaan, $id) {
+            DB::update('UPDATE penerimaan SET status = ? WHERE idpenerimaan = ?', ['C', $id]);
+
+            if ($penerimaan->idpengadaan) {
+                $this->sinkronStatusPengadaan((int) $penerimaan->idpengadaan);
+            }
+        });
+
+        return redirect()->route('penerimaan.show', $id)->with('sukses', 'Penerimaan berhasil dikonfirmasi.');
+    }
+
+    public function batalKonfirmasi(int $id): RedirectResponse
+    {
+        $penerimaan = $this->cari($id);
+
+        if ($penerimaan === null) {
+            return redirect()->route('penerimaan.index')->with('gagal', 'Penerimaan tidak ditemukan.');
+        }
+
+        if ($penerimaan->status !== 'C') {
+            return redirect()->route('penerimaan.show', $id)->with('gagal', 'Penerimaan belum dikonfirmasi.');
+        }
+
+        $adaRetur = (int) DB::selectOne(
+            'SELECT COUNT(*) AS n FROM retur WHERE idpenerimaan = ?',
+            [$id]
+        )->n;
+
+        if ($adaRetur > 0) {
+            return redirect()->route('penerimaan.show', $id)->with('gagal', 'Konfirmasi penerimaan tidak bisa dibatalkan karena sudah memiliki transaksi retur.');
+        }
+
+        DB::transaction(function () use ($penerimaan, $id) {
+            DB::update('UPDATE penerimaan SET status = ? WHERE idpenerimaan = ?', ['D', $id]);
+
+            if ($penerimaan->idpengadaan) {
+                $this->sinkronStatusPengadaan((int) $penerimaan->idpengadaan);
+            }
+        });
+
+        return redirect()->route('penerimaan.show', $id)->with('sukses', 'Konfirmasi penerimaan berhasil dibatalkan.');
+    }
+
+    public function destroy(int $id): RedirectResponse
+    {
+        $penerimaan = $this->cari($id);
+
+        if ($penerimaan === null) {
+            return redirect()->route('penerimaan.index')->with('gagal', 'Penerimaan tidak ditemukan.');
+        }
+
+        if ($penerimaan->status === 'C') {
+            return redirect()->route('penerimaan.show', $id)->with('gagal', 'Penerimaan yang sudah dikonfirmasi tidak bisa dihapus. Batalkan konfirmasi terlebih dahulu.');
+        }
+
         try {
-            DB::transaction(function () use ($id) {
+            DB::transaction(function () use ($id, $penerimaan) {
                 $adaRetur = (int) DB::selectOne(
                     'SELECT COUNT(*) AS n FROM retur WHERE idpenerimaan = ?',
                     [$id]
@@ -138,6 +200,10 @@ class PenerimaanController extends Controller
 
                 DB::delete('DELETE FROM detail_penerimaan WHERE idpenerimaan = ?', [$id]);
                 DB::delete('DELETE FROM penerimaan WHERE idpenerimaan = ?', [$id]);
+
+                if ($penerimaan->idpengadaan) {
+                    $this->sinkronStatusPengadaan((int) $penerimaan->idpengadaan);
+                }
             });
         } catch (RuntimeException $e) {
             return redirect()->route('penerimaan.index')->with('gagal', $e->getMessage());
@@ -400,5 +466,28 @@ class PenerimaanController extends Controller
         );
 
         return $header;
+    }
+
+    /**
+     * Memperbarui status pengadaan: 'S' jika semua barang sudah diterima lengkap, 'D' jika masih ada sisa.
+     */
+    private function sinkronStatusPengadaan(int $idpengadaan): void
+    {
+        $totalSisa = (int) (DB::selectOne(
+            'SELECT COALESCE(SUM(GREATEST(d.jumlah - COALESCE(t.terima, 0), 0)), 0) AS sisa
+             FROM detail_pengadaan d
+             LEFT JOIN (
+                 SELECT dp.barang_idbarang, SUM(dp.jumlah_terima) AS terima
+                 FROM detail_penerimaan dp
+                 JOIN penerimaan pn ON pn.idpenerimaan = dp.idpenerimaan
+                 WHERE pn.idpengadaan = ?
+                 GROUP BY dp.barang_idbarang
+             ) t ON t.barang_idbarang = d.idbarang
+             WHERE d.idpengadaan = ?',
+            [$idpengadaan, $idpengadaan]
+        )->sisa ?? 0);
+
+        $statusBaru = $totalSisa === 0 ? 'S' : 'D';
+        DB::update('UPDATE pengadaan SET status = ? WHERE idpengadaan = ?', [$statusBaru, $idpengadaan]);
     }
 }

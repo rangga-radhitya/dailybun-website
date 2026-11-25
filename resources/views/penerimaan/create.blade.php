@@ -78,7 +78,8 @@
       <div class="pilih-baris">
         <div class="grup-filter">
           <label>Diterima oleh</label>
-          <input type="text" value="manajer01 (user id 1)" disabled>
+          @php $pengguna = auth()->user(); @endphp
+          <input type="text" value="{{ $pengguna ? $pengguna->username.' (user id '.$pengguna->iduser.')' : '-' }}" disabled>
         </div>
       </div>
     </section>

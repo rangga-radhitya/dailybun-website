@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#140E0A">
-  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#F2F5FA">
+  <meta name="color-scheme" content="light">
   <title>@yield('judul') - {{ config('app.name', 'Daily Bun') }}</title>
   <link rel="icon" type="image/png" href="{{ asset('img/favicon.png') }}">
   <link rel="stylesheet" href="{{ asset('css/style.css') }}">
@@ -38,7 +38,7 @@
     <div class="sisi-merek">
       <a href="{{ route('dashboard') }}">
         <span class="merek-ikon" aria-hidden="true">
-          <img src="{{ asset('img/logo-icon.png') }}" alt="" width="42" height="42" decoding="async">
+          <img src="{{ asset('img/logo-putih.png') }}" alt="" width="36" height="36" decoding="async">
         </span>
         <span class="merek-teks">
           <strong>{{ config('app.name', 'Daily Bun') }}</strong>

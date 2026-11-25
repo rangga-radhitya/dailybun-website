@@ -18,6 +18,11 @@
     <form method="POST" action="{{ route('penerimaan.batal_konfirmasi', $penerimaan->idpenerimaan) }}">
       @csrf
       @method('PATCH')
+      <button type="button" class="tombol sekunder"
+              data-konfirmasi="Batalkan konfirmasi penerimaan #{{ $penerimaan->idpenerimaan }}?">
+        <x-ikon nama="tutup" :ukuran="15" />
+        Batal Konfirmasi
+      </button>
     </form>
   @else
     <form method="POST" action="{{ route('penerimaan.konfirmasi', $penerimaan->idpenerimaan) }}">
@@ -119,6 +124,12 @@
         </tbody>
       </table>
       </div>
+      <p>
+        <a class="tombol sekunder kecil" href="{{ route('retur.create', ['idpenerimaan' => $penerimaan->idpenerimaan]) }}">
+          <x-ikon nama="tambah" :ukuran="14" />
+          Buat Retur
+        </a>
+      </p>
     </section>
   @endakses
 @endsection

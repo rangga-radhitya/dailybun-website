@@ -33,7 +33,7 @@ class ReturController extends Controller
 
     public function create(Request $request): View
     {
-        $idpenerimaan = (int) $request->query('idpenerimaan', 0);
+        $idpenerimaan = (int) $request->query('idpenerimaan', $request->old('idpenerimaan', 0));
 
         $daftarPenerimaan = $this->penerimaanTersedia();
         $penerimaan = null;

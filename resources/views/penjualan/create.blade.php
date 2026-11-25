@@ -44,7 +44,8 @@
     <div class="pilih-baris">
       <div class="grup-filter">
         <label>Kasir</label>
-        <input type="text" value="manajer01" disabled>
+        @php $pengguna = auth()->user(); @endphp
+        <input type="text" value="{{ $pengguna ? $pengguna->username.' (user id '.$pengguna->iduser.')' : '-' }}" disabled>
       </div>
       <div class="grup-filter">
         <label>Margin aktif</label>

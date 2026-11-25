@@ -112,7 +112,8 @@
     pemicu = dari || null;
     modal.hidden = false;
     document.body.classList.add('modal-terbuka');
-    var pertama = modal.querySelector('input:not([disabled]):not([type="hidden"]), select:not([disabled]), button:not([disabled])');
+    // Utamakan isian form; tombol tutup hanya jadi fokus bila tidak ada isian.
+    var pertama = modal.querySelector('form input:not([disabled]):not([type="hidden"]), form select:not([disabled]), form textarea:not([disabled]), button:not([disabled])');
     if (pertama) pertama.focus();
   }
   function tutupModal() {
@@ -204,48 +205,8 @@
     if (modalAktif) tutupModal();
     else tutupSisi();
   });
-  // Sorotan kursor di permukaan kaca (kartu, panel, KPI).
-  // Satu pendengar untuk seluruh halaman, bukan satu per kartu; posisi dihitung
-  // sekali per frame dan hanya saat pointer benar-benar bergerak.
-  var bisaSorot = window.matchMedia('(hover: hover) and (pointer: fine)');
+
   var kurangiGerak = window.matchMedia('(prefers-reduced-motion: reduce)');
-  if (bisaSorot.matches && !kurangiGerak.matches) {
-    var sorot = null;
-    var sorotX = 0;
-    var sorotY = 0;
-    var sorotAntre = false;
-
-    var gambarSorot = function () {
-      sorotAntre = false;
-      if (!sorot) return;
-      var kotak = sorot.getBoundingClientRect();
-      sorot.style.setProperty('--mx', (sorotX - kotak.left) + 'px');
-      sorot.style.setProperty('--my', (sorotY - kotak.top) + 'px');
-    };
-
-    document.addEventListener('pointermove', function (e) {
-      var permukaan = e.target instanceof Element
-        ? e.target.closest('.kartu, .panel, .kpi')
-        : null;
-      if (!permukaan) { sorot = null; return; }
-      sorot = permukaan;
-      sorotX = e.clientX;
-      sorotY = e.clientY;
-      if (sorotAntre) return;
-      sorotAntre = true;
-      window.requestAnimationFrame(gambarSorot);
-    }, { passive: true });
-
-    // Saat pointer keluar dari permukaan, kembalikan sorotan ke tengah.
-    document.addEventListener('pointerout', function (e) {
-      var dari = e.target instanceof Element ? e.target.closest('.kartu, .panel, .kpi') : null;
-      if (!dari) return;
-      var ke = e.relatedTarget instanceof Element ? e.relatedTarget.closest('.kartu, .panel, .kpi') : null;
-      if (ke === dari) return;
-      dari.style.removeProperty('--mx');
-      dari.style.removeProperty('--my');
-    }, { passive: true });
-  }
   // Angka KPI dashboard bergerak dari 0 ke nilai akhir. Nilai server tetap
   // tersimpan di data-hitung, jadi tanpa JavaScript angkanya sudah benar.
   var angkaKpi = document.querySelectorAll('[data-hitung]');

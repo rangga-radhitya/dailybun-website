@@ -14,7 +14,6 @@
     Kembali
   </a>
 
-  </button>
   <form method="POST" action="{{ route('penjualan.destroy', $penjualan->idpenjualan) }}">
     @csrf
     @method('DELETE')
@@ -63,12 +62,7 @@
           @php $marginNilai = (float) ($penjualan->margin_nilai ?? 0); @endphp
           <tr>
             <td colspan="5" class="angka">Subtotal barang (jumlah × harga satuan)</td>
-            <td class="angka">
-              <x-rp :nilai="$totalDetail" />
-              @if ($penjualan->subtotal_nilai !== null)
-                <x-badge :jenis="(float) $totalDetail + $marginNilai === (float) $penjualan->subtotal_nilai ? 'sukses' : 'bahaya'" :teks="(float) $totalDetail + $marginNilai === (float) $penjualan->subtotal_nilai ? 'sesuai' : 'berbeda dari subtotal tercatat'" />
-              @endif
-            </td>
+            <td class="angka"><x-rp :nilai="$totalDetail" /></td>
           </tr>
           @if ($penjualan->persen !== null)
             <tr><td colspan="5" class="angka">Margin (<x-persen :nilai="$penjualan->persen" />)</td><td class="angka"><x-rp :nilai="$penjualan->margin_nilai" /></td></tr>

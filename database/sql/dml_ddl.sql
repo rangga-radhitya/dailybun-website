@@ -199,7 +199,7 @@ CREATE TABLE kartu_stok (
     keluar INT,
     stock INT,
     created_at TIMESTAMP,
-    idtransaksi INT,
+    idtransaksi BIGINT,
     idbarang INT,
     PRIMARY KEY (idkartu_stok),
     CONSTRAINT fk_kartustok_barang

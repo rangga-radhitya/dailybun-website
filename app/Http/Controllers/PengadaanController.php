@@ -276,7 +276,11 @@ class PengadaanController extends Controller
                 [$id]
             )->total;
 
-            $ppn = (int) round($subtotal * $ppnPersen / 100);
+            // fn_hitung_ppn(subtotal, persen).
+            $ppn = (int) DB::selectOne(
+                'SELECT fn_hitung_ppn(?, ?) AS ppn',
+                [$subtotal, $ppnPersen]
+            )->ppn;
 
             DB::update(
                 'UPDATE pengadaan SET subtotal_nilai = ?, ppn = ?, total_nilai = ? WHERE idpengadaan = ?',

@@ -69,8 +69,8 @@ class BarangController extends Controller
             return redirect()->route('barang')->with('gagal', 'Barang tidak ditemukan.');
         }
 
-        $baru = (int) $barang->status === 1 ? 0 : 1;
-        DB::update('UPDATE barang SET status = ? WHERE idbarang = ?', [$baru, $id]);
+        DB::select('CALL sp_ubah_status_barang(?)', [$id]);
+        $baru = (int) $this->cari($id)->status;
 
         return redirect()->route('barang')->with('sukses', 'Status barang berhasil diubah menjadi '.($baru === 1 ? 'aktif' : 'nonaktif').'.');
     }
@@ -123,9 +123,7 @@ class BarangController extends Controller
     {
         $sql = 'SELECT vb.idbarang, vb.nama, vb.jenis, vb.jenis_teks, vb.idsatuan, vb.nama_satuan,
                        vb.harga, vb.status,
-                       COALESCE((SELECT ks.stock FROM kartu_stok ks
-                                  WHERE ks.idbarang = vb.idbarang
-                                  ORDER BY ks.idkartu_stok DESC LIMIT 1), 0) AS stok
+                       fn_stok_barang(vb.idbarang) AS stok
                 FROM v_barang vb';
         $bind = [];
 

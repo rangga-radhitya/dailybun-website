@@ -13,7 +13,7 @@ class KartuStokController extends Controller
     {
         $q = trim((string) $request->query('q', ''));
 
-        $daftar = $this->daftar($q, 20, $request);
+        $daftar = $this->daftar($q, 100, $request);
 
         return view('kartu_stok.index', compact('daftar', 'q'));
     }

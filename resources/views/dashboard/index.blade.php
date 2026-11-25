@@ -20,22 +20,25 @@
   @if ($bolehPenjualan)
     <div class="hero-grid{{ $bolehMargin ? '' : ' hero-tunggal' }}">
       <section class="hero-penjualan">
-        <div class="hero-label">
-          <x-ikon nama="penjualan" :ukuran="15" />
-          Penjualan hari ini
+        <div class="hero-atas">
+          <div class="hero-label">
+            <x-ikon nama="penjualan" :ukuran="15" />
+            Penjualan hari ini
+          </div>
+          <span class="hero-tanggal">{{ \Carbon\Carbon::parse($hari)->format('d/m/Y') }} · UTC</span>
         </div>
         <div class="hero-nilai" data-hitung="{{ $ringkas['nilai_hari_ini'] }}" data-format="rp"><x-rp :nilai="$ringkas['nilai_hari_ini']" /></div>
-        <div class="hero-meta">
-          <span>{{ $ringkas['penjualan_hari_ini'] }} transaksi</span>
-          <span aria-hidden="true">·</span>
-          <span>{{ \Carbon\Carbon::parse($hari)->format('d/m/Y') }}</span>
-          <span aria-hidden="true">·</span>
-          <span title="Zona waktu aplikasi menggunakan UTC">UTC</span>
+        <div class="hero-kaki">
+          <div class="hero-meta">
+            <span class="ket"><strong>{{ number_format((int) $ringkas['penjualan_hari_ini'], 0, ',', '.') }}</strong> transaksi tercatat</span>
+            <span aria-hidden="true">·</span>
+            <span>Total nilai penjualan</span>
+          </div>
+          <a class="hero-tautan" href="{{ route('penjualan.index') }}">
+            Buka penjualan
+            <x-ikon nama="panah" :ukuran="14" />
+          </a>
         </div>
-        <a class="hero-tautan" href="{{ route('penjualan.index') }}">
-          Lihat penjualan
-          <x-ikon nama="panah" :ukuran="14" />
-        </a>
       </section>
 
       @if ($bolehMargin)
@@ -65,7 +68,7 @@
   @endif
 
   @if ($adaKpiModul)
-    <section class="kartu kpi-strip" aria-label="Ringkasan operasional">
+    <section class="kpi-strip" aria-label="Ringkasan operasional">
     @akses('pengadaan')
       <a class="kpi" href="{{ route('pengadaan.index') }}">
         <span class="kpi-label">Pengadaan</span>
@@ -115,18 +118,15 @@
         <span class="kpi-tautan">Data user <x-ikon nama="panah" :ukuran="13" /></span>
       </a>
     @endakses
-    </section>
-  @endif
-
-  @akses('penjualan')
-    <section class="kartu kpi-strip kpi-tiga" aria-label="Ringkasan penjualan">
+     @akses('penjualan')
       <a class="kpi" href="{{ route('penjualan.index') }}">
         <span class="kpi-label">Transaksi</span>
-        <span class="kpi-nilai" data-hitung="{{ $ringkas['penjualan'] }}">{{ number_format($ringkas['penjualan'], 0, ',', '.') }}</span>
-        <span class="kpi-tautan">Semua waktu <x-ikon nama="panah" :ukuran="13" /></span>
+        <span class="kpi-nilai" data-hitung="{{ $ringkas['penjualan'] }}">{{ number_format((int) $ringkas['penjualan'], 0, ',', '.') }}</span>
+        <span class="kpi-tautan">Data penjualan <x-ikon nama="panah" :ukuran="13" /></span>
       </a>
+    @endakses
     </section>
-  @endakses
+  @endif
 
   <div class="dua-kolom">
     @akses('penjualan')
@@ -182,10 +182,4 @@
     @endakses
   </div>
 
-  <x-catatan ringkas judul="Catatan data">
-    @akses('kartu_stok')
-      Stok berjalan per barang dapat dilihat di halaman <a href="{{ route('kartu_stok') }}">Kartu Stok</a>.
-    @endakses
-    Ringkasan stok rendah belum dihitung pada dashboard.
-  </x-catatan>
 @endsection
