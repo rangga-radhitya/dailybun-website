@@ -123,38 +123,6 @@ class PenerimaanController extends Controller
         return redirect()->route('penerimaan.show', $id)->with('sukses', 'Penerimaan berhasil dikonfirmasi.');
     }
 
-    public function batalKonfirmasi(int $id): RedirectResponse
-    {
-        $penerimaan = $this->cari($id);
-
-        if ($penerimaan === null) {
-            return redirect()->route('penerimaan.index')->with('gagal', 'Penerimaan tidak ditemukan.');
-        }
-
-        if ($penerimaan->status !== 'C') {
-            return redirect()->route('penerimaan.show', $id)->with('gagal', 'Penerimaan belum dikonfirmasi.');
-        }
-
-        $adaRetur = (int) DB::selectOne(
-            'SELECT COUNT(*) AS n FROM retur WHERE idpenerimaan = ?',
-            [$id]
-        )->n;
-
-        if ($adaRetur > 0) {
-            return redirect()->route('penerimaan.show', $id)->with('gagal', 'Konfirmasi penerimaan tidak bisa dibatalkan karena sudah memiliki transaksi retur.');
-        }
-
-        DB::transaction(function () use ($penerimaan, $id) {
-            DB::update('UPDATE penerimaan SET status = ? WHERE idpenerimaan = ?', ['D', $id]);
-
-            if ($penerimaan->idpengadaan) {
-                $this->sinkronStatusPengadaan((int) $penerimaan->idpengadaan);
-            }
-        });
-
-        return redirect()->route('penerimaan.show', $id)->with('sukses', 'Konfirmasi penerimaan berhasil dibatalkan.');
-    }
-
     public function destroy(int $id): RedirectResponse
     {
         $penerimaan = $this->cari($id);

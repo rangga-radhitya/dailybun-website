@@ -104,7 +104,6 @@ Route::middleware('auth')->group(function () {
         Route::get('/penerimaan', [PenerimaanController::class, 'index'])->name('penerimaan.index');
         Route::get('/penerimaan/{id}', [PenerimaanController::class, 'show'])->whereNumber('id')->name('penerimaan.show');
         Route::patch('/penerimaan/{id}/konfirmasi', [PenerimaanController::class, 'konfirmasi'])->whereNumber('id')->name('penerimaan.konfirmasi');
-        Route::patch('/penerimaan/{id}/batal-konfirmasi', [PenerimaanController::class, 'batalKonfirmasi'])->whereNumber('id')->name('penerimaan.batal_konfirmasi');
         Route::delete('/penerimaan/{id}', [PenerimaanController::class, 'destroy'])->whereNumber('id')->name('penerimaan.destroy');
     });
 

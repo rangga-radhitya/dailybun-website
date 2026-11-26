@@ -14,17 +14,7 @@
     <x-ikon nama="kiri" :ukuran="15" />
     Kembali
   </a>
-  @if ($penerimaan->status === 'C')
-    <form method="POST" action="{{ route('penerimaan.batal_konfirmasi', $penerimaan->idpenerimaan) }}">
-      @csrf
-      @method('PATCH')
-      <button type="button" class="tombol sekunder"
-              data-konfirmasi="Batalkan konfirmasi penerimaan #{{ $penerimaan->idpenerimaan }}?">
-        <x-ikon nama="tutup" :ukuran="15" />
-        Batal Konfirmasi
-      </button>
-    </form>
-  @else
+  @if ($penerimaan->status !== 'C')
     <form method="POST" action="{{ route('penerimaan.konfirmasi', $penerimaan->idpenerimaan) }}">
       @csrf
       @method('PATCH')

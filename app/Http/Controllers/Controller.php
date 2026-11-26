@@ -13,7 +13,9 @@ abstract class Controller
     /** User yang sedang login; fallback untuk CLI dan pengujian tanpa sesi. */
     protected function idUser(): int
     {
-        return (int) (auth()->id() ?? self::ID_USER_DEFAULT);
+        $user = request()->user();
+
+        return (int) ($user?->getAuthIdentifier() ?? self::ID_USER_DEFAULT);
     }
 
     protected function tanggal(Request $request, string $kunci): string
