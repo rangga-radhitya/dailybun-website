@@ -61,7 +61,7 @@
         @if ($totalDetail !== null)
           @php $marginNilai = (float) ($penjualan->margin_nilai ?? 0); @endphp
           <tr>
-            <td colspan="5" class="angka">Subtotal barang (jumlah × harga satuan)</td>
+            <td colspan="5" class="angka">Subtotal barang</td>
             <td class="angka"><x-rp :nilai="$totalDetail" /></td>
           </tr>
           @if ($penjualan->persen !== null)

@@ -13,8 +13,13 @@ class BarangController extends Controller
     public function index(Request $request): View
     {
         $q = trim((string) $request->query('q', ''));
+        $status = (string) $request->query('status', '');
 
-        $daftar = $this->daftar($q);
+        if (! in_array($status, ['0', '1'], true)) {
+            $status = '';
+        }
+
+        $daftar = $this->daftar($q, $status);
         $daftarSatuan = $this->semuaSatuan();
 
         $opsiSatuan = [];
@@ -22,7 +27,7 @@ class BarangController extends Controller
             $opsiSatuan[(string) $s->idsatuan] = $s->nama_satuan;
         }
 
-        return view('barang.index', compact('daftar', 'q', 'daftarSatuan', 'opsiSatuan'));
+        return view('barang.index', compact('daftar', 'q', 'status', 'daftarSatuan', 'opsiSatuan'));
     }
 
     public function store(Request $request): RedirectResponse
@@ -119,17 +124,27 @@ class BarangController extends Controller
     }
 
     /** @return array<int, object> */
-    private function daftar(string $q): array
+    private function daftar(string $q, string $status): array
     {
         $sql = 'SELECT vb.idbarang, vb.nama, vb.jenis, vb.jenis_teks, vb.idsatuan, vb.nama_satuan,
                        vb.harga, vb.status,
                        fn_stok_barang(vb.idbarang) AS stok
                 FROM v_barang vb';
+        $where = [];
         $bind = [];
 
         if ($q !== '') {
-            $sql .= ' WHERE vb.nama LIKE ?';
+            $where[] = 'vb.nama LIKE ?';
             $bind[] = '%'.$q.'%';
+        }
+
+        if ($status !== '') {
+            $where[] = 'vb.status = ?';
+            $bind[] = (int) $status;
+        }
+
+        if ($where !== []) {
+            $sql .= ' WHERE '.implode(' AND ', $where);
         }
 
         $sql .= ' ORDER BY vb.idbarang';

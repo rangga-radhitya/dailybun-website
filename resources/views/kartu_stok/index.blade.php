@@ -5,14 +5,6 @@
 
 @section('isi')
 
-  @php
-    $lencanaJenis = [
-        'M' => ['kelas' => 'sukses', 'arti' => 'Stok masuk/pengembalian'],
-        'K' => ['kelas' => 'bahaya', 'arti' => 'Stok keluar (penjualan/koreksi)'],
-        'R' => ['kelas' => 'proses', 'arti' => 'Retur ke vendor'],
-    ];
-  @endphp
-
   <x-filter-bar :reset="route('kartu_stok')">
     <div class="grup-filter">
       <label for="q">Cari nama / ID</label>
@@ -32,9 +24,9 @@
         <td>{{ $r->tanggal ?? '-' }}</td>
         <td>{{ $r->nama_barang ?? ($r->idbarang ? 'Barang #'.$r->idbarang : '-') }}</td>
         <td>
-          <x-badge :jenis="$lencanaJenis[$r->jenis_transaksi]['kelas'] ?? 'netral'"
-                   :teks="$r->jenis_transaksi ?? '-'"
-                   :title="$lencanaJenis[$r->jenis_transaksi]['arti'] ?? 'Arti kode belum diketahui'" />
+          <x-badge :jenis="(int) ($r->masuk ?? 0) > 0 ? 'sukses' : 'bahaya'"
+                   :teks="(int) ($r->masuk ?? 0) > 0 ? 'Masuk' : 'Keluar'"
+                   :title="(int) ($r->masuk ?? 0) > 0 ? 'Stok masuk' : 'Stok keluar'" />
         </td>
         <td class="angka">{{ $r->masuk ?? 0 }}</td>
         <td class="angka">{{ $r->keluar ?? 0 }}</td>

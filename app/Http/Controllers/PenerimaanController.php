@@ -364,7 +364,7 @@ class PenerimaanController extends Controller
 
                 // Kunci baris pesanan agar pemeriksaan sisa berurutan per barang.
                 $pesanan = DB::selectOne(
-                    'SELECT jumlah FROM detail_pengadaan
+                    'SELECT jumlah, harga_satuan FROM detail_pengadaan
                      WHERE idpengadaan = ? AND idbarang = ?
                      LIMIT 1 FOR UPDATE',
                     [$idpengadaan, $idbarang]
@@ -388,6 +388,11 @@ class PenerimaanController extends Controller
                      VALUES (?, ?, ?, ?, ?)',
                     [$id, $idbarang, $jumlah, $harga, $harga * $jumlah]
                 );
+
+                // Harga master barang ikut diperbarui hanya bila harga di penerimaan diubah.
+                if ((int) $pesanan->harga_satuan !== $harga) {
+                    DB::update('UPDATE barang SET harga = ? WHERE idbarang = ?', [$harga, $idbarang]);
+                }
             }
 
             return $id;

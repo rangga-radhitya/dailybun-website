@@ -316,7 +316,7 @@ class ReturController extends Controller
 
                 $saldo = $this->saldoTerakhir($idbarang);
 
-                $this->catatStok('R', 0, $jumlah, $saldo - $jumlah, $id, $idbarang);
+                $this->catatStok('K', 0, $jumlah, $saldo - $jumlah, $id, $idbarang);
             }
 
             return $id;

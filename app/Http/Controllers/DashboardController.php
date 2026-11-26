@@ -65,7 +65,7 @@ class DashboardController extends Controller
                     u.username, p.total_nilai
              FROM penjualan p
              LEFT JOIN `user` u ON u.iduser = p.iduser
-             ORDER BY p.idpenjualan DESC
+             ORDER BY p.idpenjualan ASC
              LIMIT ".(int) $batas
         );
     }
@@ -78,7 +78,7 @@ class DashboardController extends Controller
                     v.nama_vendor, p.total_nilai
              FROM pengadaan p
              LEFT JOIN vendor v ON v.idvendor = p.vendor_idvendor
-             ORDER BY p.idpengadaan DESC
+             ORDER BY p.idpengadaan ASC
              LIMIT ".(int) $batas
         );
     }

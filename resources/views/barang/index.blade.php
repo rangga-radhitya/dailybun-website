@@ -17,6 +17,14 @@
       <label for="q">Cari nama barang</label>
       <input type="search" id="q" name="q" value="{{ $q }}" placeholder="Nama barang">
     </div>
+    <div class="grup-filter">
+      <label for="status">Status</label>
+      <select id="status" name="status">
+        <option value="">Semua status</option>
+        <option value="1" @selected($status === '1')>Aktif</option>
+        <option value="0" @selected($status === '0')>Nonaktif</option>
+      </select>
+    </div>
   </x-filter-bar>
 
   <div data-hasil-daftar>
@@ -54,7 +62,7 @@
         </td>
       </tr>
     @empty
-      <tr><td colspan="8" class="kosong">{{ $q !== '' ? 'Tidak ada barang yang cocok dengan pencarian.' : 'Belum ada data barang.' }}</td></tr>
+      <tr><td colspan="8" class="kosong">{{ $q !== '' || $status !== '' ? 'Tidak ada barang yang cocok dengan filter.' : 'Belum ada data barang.' }}</td></tr>
     @endforelse
     </tbody>
   </table>
